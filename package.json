@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "CLI for markwhen documents",
   "type": "module",
-  "bin": "lib/index.js",
+  "bin": {
+    "mw": "lib/index.js"
+  },
   "scripts": {
     "build": "tsc && node build.js",
     "test": "echo \"Error: no test specified\" && exit 1",
