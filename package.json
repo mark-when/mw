@@ -1,0 +1,35 @@
+{
+  "name": "@markwhen/mw",
+  "version": "1.0.0",
+  "description": "CLI for markwhen documents",
+  "type": "module",
+  "bin": "lib/index.js",
+  "scripts": {
+    "build": "tsc && node build.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "tsc-watch",
+    "link:parser": "yalc add @markwhen/parser && yalc link @markwhen/parser && npm install",
+    "unlink:parser": "yalc remove @markwhen/parser && npm install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/luxon": "^3.2.0",
+    "@types/node": "^18.15.5",
+    "@types/yargs": "^17.0.23",
+    "esbuild": "^0.17.12",
+    "tsc-watch": "^6.0.0",
+    "typescript": "^5.0.2"
+  },
+  "dependencies": {
+    "@markwhen/calendar": "^1.0.1",
+    "@markwhen/parser": "^0.6.3",
+    "@markwhen/resume": "^1.0.0",
+    "@markwhen/timeline": "^1.0.0",
+    "@nuxt/devalue": "^2.0.0",
+    "node-html-parser": "^6.1.5",
+    "yargs": "^17.7.1"
+  },
+  "files": ["lib/**/*", "html/**/*"]
+}
