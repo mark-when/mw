@@ -68,6 +68,21 @@ function templateHtml(viewType: Exclude<ViewType, "json">) {
   return templateHtml;
 }
 
+const appState = (parsed: Timelines, rawText: string) => ({
+  app: {
+    isDark: false,
+    pageIndex: 0,
+  },
+  markwhen: {
+    rawText,
+    parsed: parsed.timelines,
+    page: {
+      parsed: parsed.timelines[0],
+      transformed: parsed.timelines[0].events,
+    },
+  },
+});
+
 function getInitialHtml(
   parsed: Timelines,
   rawText: string,
@@ -77,24 +92,11 @@ function getInitialHtml(
     return JSON.stringify(parsed);
   }
 
-  const appState = {
-    app: {
-      isDark: false,
-      pageIndex: 0,
-    },
-    markwhen: {
-      rawText,
-      parsed: parsed.timelines,
-      page: {
-        parsed: parsed.timelines[0],
-        transformed: parsed.timelines[0].events,
-      },
-    },
-  };
-
   return injectScript(
     templateHtml(viewType),
-    `var __markwhen_initial_state = ${JSON.stringify(appState)}`
+    `var __markwhen_initial_state = ${JSON.stringify(
+      appState(parsed, rawText)
+    )}`
   );
 }
 
@@ -120,7 +122,7 @@ async function main() {
     return;
   }
 
-  let destination = "timeline.mw.json";
+  let destination: string | undefined;
   if (args.destination) {
     destination = args.destination;
   } else if (args._[desintationArgsIndex]) {
@@ -138,15 +140,14 @@ async function main() {
     ] as [string, typeof outputType][];
 
     for (const option of options) {
-      if (destination.endsWith(option[0])) {
+      if (destination?.endsWith(option[0])) {
         outputType = option[1];
       }
     }
   }
-
   if (outputType === "json") {
     const asJson = JSON.stringify(parsed);
-    writeFileSync(destination, asJson);
+    writeFileSync(destination || "timeline.mw.json", asJson);
     return;
   }
 
@@ -158,28 +159,12 @@ async function main() {
       watch(path.join("" + inputFileName), "utf-8", (type, f) => {
         console.log("Updating...");
 
-        const { parsed, rawText } = getParseFromFile(inputFileName);
-        const appState = {
-          app: {
-            isDark: false,
-            pageIndex: 0,
-          },
-          markwhen: {
-            rawText,
-            parsed: parsed.timelines,
-            page: {
-              parsed: parsed.timelines[0],
-              transformed: parsed.timelines[0].events,
-            },
-          },
-        };
-
         ws.send(
           JSON.stringify({
             type: "state",
             request: true,
             id: `markwhen_1234`,
-            params: appState,
+            params: appState(parsed, rawText),
           })
         );
       });
@@ -189,7 +174,8 @@ async function main() {
     app.get("/", (req, res) => {
       const html = injectScript(
         templateHtml(outputType as Exclude<ViewType, "json">),
-        `var __markwhen_wss_url = "ws://localhost:${wsPort}"`
+        `var __markwhen_wss_url = "ws://localhost:${wsPort}"; 
+var __markwhen_initial_state = ${JSON.stringify(appState(parsed, rawText))}`
       );
       res.status(200).send(html);
     });
@@ -199,7 +185,7 @@ async function main() {
     console.log(`Server running at http://localhost:${port}`);
   } else {
     const initialHtml = getInitialHtml(parsed, rawText, outputType);
-    writeFileSync(destination, initialHtml);
+    writeFileSync(destination || `${outputType}.html`, initialHtml);
   }
 }
 
