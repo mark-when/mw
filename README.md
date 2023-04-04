@@ -56,9 +56,3 @@ Watch `projects.mw` and get immediate updates in `localhost:3000`:
 ```sh
 mw serve projects.mw -o calendar
 ```
-
-## Changelog
-
-### 1.0.1
-- Support live serving with sockets
-- Fix https://github.com/mark-when/markwhen/issues/107
