@@ -129,7 +129,7 @@ async function main() {
     destination = `${args._[desintationArgsIndex]}`;
   }
 
-  let outputType = (args.outputType || "json") as ViewType;
+  let outputType = args.outputType as ViewType | undefined;
   if (!args.outputType) {
     // Try to infer output type from filename
     const options = [
@@ -145,20 +145,21 @@ async function main() {
       }
     }
   }
-  if (outputType === "json") {
-    const asJson = JSON.stringify(parsed);
-    writeFileSync(destination || "timeline.mw.json", asJson);
-    return;
-  }
 
   if (serving) {
+    if (outputType === "json") {
+      console.log(
+        "Specify a view to serve with --output: `mw serve file.mw --output timeline`"
+      );
+      return;
+    }
     const wsPort =
       parseInt(process.env.SOCKET_PORT || "0") || args.socketPort || 3001;
     const wss = new WebSocketServer({ port: wsPort });
     wss.on("connection", (ws) => {
       watch(path.join("" + inputFileName), "utf-8", (type, f) => {
         console.log("Updating...");
-
+        const { parsed, rawText } = getParseFromFile(inputFileName);
         ws.send(
           JSON.stringify({
             type: "state",
@@ -173,7 +174,7 @@ async function main() {
     const app = express();
     app.get("/", (req, res) => {
       const html = injectScript(
-        templateHtml(outputType as Exclude<ViewType, "json">),
+        templateHtml((outputType as Exclude<ViewType, "json">) || "timeline"),
         `var __markwhen_wss_url = "ws://localhost:${wsPort}"; 
 var __markwhen_initial_state = ${JSON.stringify(appState(parsed, rawText))}`
       );
@@ -183,8 +184,12 @@ var __markwhen_initial_state = ${JSON.stringify(appState(parsed, rawText))}`
     const port = process.env.PORT || args.port || 3000;
     app.listen(port);
     console.log(`Server running at http://localhost:${port}`);
+  } else if (outputType === "json") {
+    const asJson = JSON.stringify(parsed);
+    writeFileSync(destination || "timeline.mw.json", asJson);
+    return;
   } else {
-    const initialHtml = getInitialHtml(parsed, rawText, outputType);
+    const initialHtml = getInitialHtml(parsed, rawText, outputType || "json");
     writeFileSync(destination || `${outputType}.html`, initialHtml);
   }
 }
