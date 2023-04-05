@@ -1,4 +1,9 @@
+## 1.1.2
+
+- Allow documents to specify a `preferredView` in their header that will be abided by if `outputType` is not specified
+
 ## 1.1.1
+
 - Fix watch (we weren't rereading the file)
 - Default watch to timeline view
 
