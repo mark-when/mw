@@ -173,8 +173,19 @@ async function main() {
 
     const app = express();
     app.get("/", (req, res) => {
+      if (!outputType) {
+        const headerPreferredView = parsed.timelines[0].header?.preferredView;
+        if (
+          headerPreferredView &&
+          ["timeline", "resume", "calendar"].includes(headerPreferredView)
+        ) {
+          outputType = headerPreferredView as Exclude<ViewType, "json">;
+        } else {
+          outputType = "timeline";
+        }
+      }
       const html = injectScript(
-        templateHtml((outputType as Exclude<ViewType, "json">) || "timeline"),
+        templateHtml(outputType as Exclude<ViewType, "json">),
         `var __markwhen_wss_url = "ws://localhost:${wsPort}"; 
 var __markwhen_initial_state = ${JSON.stringify(appState(parsed, rawText))}`
       );
@@ -189,7 +200,18 @@ var __markwhen_initial_state = ${JSON.stringify(appState(parsed, rawText))}`
     writeFileSync(destination || "timeline.mw.json", asJson);
     return;
   } else {
-    const initialHtml = getInitialHtml(parsed, rawText, outputType || "json");
+    if (!outputType) {
+      const headerPreferredView = parsed.timelines[0].header?.preferredView;
+      if (
+        headerPreferredView &&
+        ["timeline", "resume", "calendar"].includes(headerPreferredView)
+      ) {
+        outputType = headerPreferredView as Exclude<ViewType, "json">;
+      } else {
+        outputType = "timeline";
+      }
+    }
+    const initialHtml = getInitialHtml(parsed, rawText, outputType);
     writeFileSync(destination || `${outputType}.html`, initialHtml);
   }
 }
