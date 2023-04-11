@@ -71,15 +71,11 @@ function templateHtml(viewType: Exclude<ViewType, "json">) {
 const appState = (parsed: Timelines, rawText: string) => ({
   app: {
     isDark: false,
-    pageIndex: 0,
   },
   markwhen: {
     rawText,
     parsed: parsed.timelines,
-    page: {
-      parsed: parsed.timelines[0],
-      transformed: parsed.timelines[0].events,
-    },
+    transformed: parsed.timelines[0].events,
   },
 });
 
