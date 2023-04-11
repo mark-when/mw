@@ -1,3 +1,6 @@
+## 1.2.0
+- Bump parser
+
 ## 1.1.2
 
 - Allow documents to specify a `preferredView` in their header that will be abided by if `outputType` is not specified
