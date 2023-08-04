@@ -99,8 +99,6 @@ function getInitialHtml(
   );
 }
 
-const getIcalEvents = () => {};
-
 async function main() {
   const args = await argv;
   let inputFileName = "" + args._[0];

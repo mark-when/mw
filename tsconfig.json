@@ -15,7 +15,8 @@
       "@/*": ["./*"]
     },
     "types": ["@types/node"],
-    "outDir": "lib"
+    "outDir": "lib",
+    "skipLibCheck": true
   },
   "include": ["src/**/*"]
 }

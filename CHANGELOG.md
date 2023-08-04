@@ -1,3 +1,8 @@
+## 1.2.1
+- Very basic ical -> markwhen conversion
+
+Usage: `mw calendar.ical` -> outputs calendar.mw
+
 ## 1.2.0
 - Bump parser
 
