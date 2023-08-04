@@ -10,6 +10,9 @@ import express from "express";
 import { parse as parseHtml } from "node-html-parser";
 import { Timelines } from "@markwhen/parser/lib/Types";
 import { WebSocketServer } from "ws";
+import ICAL from "ical.js";
+import { DateTime } from "luxon";
+import { dateRangeToString } from "./dateTimeUtilities.js";
 
 const er = (m: string) => {
   process.stderr.write(m);
@@ -96,18 +99,68 @@ function getInitialHtml(
   );
 }
 
+const getIcalEvents = () => {};
+
 async function main() {
   const args = await argv;
-  let inputFileName = args._[0];
+  let inputFileName = "" + args._[0];
   let serving = false;
   if (inputFileName === "serve") {
     serving = true;
-    inputFileName = args._[1];
+    inputFileName = "" + args._[1];
     if (!inputFileName) {
       er("Provide an input markwhen file");
     }
   }
 
+  if (
+    [".ical", ".ics", ".ifb", ".icalendar"].some((ext) =>
+      inputFileName.endsWith(ext)
+    )
+  ) {
+    // is ical
+    const content = readFileSync(inputFileName, "utf-8");
+    let markwhenText = "";
+    const icalParse = ICAL.parse(content);
+    const component = new ICAL.Component(icalParse);
+    const vevents = component.getAllSubcomponents("vevent");
+    for (const vevent of vevents) {
+      const event = new ICAL.Event(vevent);
+
+      const timezone =
+        component
+          .getFirstSubcomponent("vtimezone")
+          ?.getFirstPropertyValue<string>("tzid") || "";
+
+      const fromDateTime = timezone
+        ? DateTime.fromISO(event.startDate.toString(), { zone: timezone })
+        : DateTime.fromMillis(event.startDate.toUnixTime() * 1000);
+
+      const toDateTime = timezone
+        ? DateTime.fromISO(event.startDate.toString(), { zone: timezone })
+        : DateTime.fromMillis(event.endDate.toUnixTime() * 1000);
+
+      markwhenText += `${dateRangeToString(
+        {
+          fromDateTime,
+          toDateTime,
+        },
+        "day",
+        undefined
+      )}: ${event.summary}\n`;
+      if (event.description) {
+        const adjustedDescription = event.description
+          .split("\n")
+          .filter((line) => !line.startsWith("-::~:~"))
+          .join("\n");
+        markwhenText += `${adjustedDescription}\n`;
+      }
+    }
+    const fileName =
+      inputFileName.substring(0, inputFileName.lastIndexOf(".")) + ".mw";
+    writeFileSync(fileName, markwhenText);
+    return;
+  }
   const { parsed, rawText } = getParseFromFile(inputFileName);
 
   const desintationArgsIndex = serving ? 2 : 1;
