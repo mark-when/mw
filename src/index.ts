@@ -2,13 +2,12 @@
 
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { parse } from "@markwhen/parser/lib/index.js";
+import { parse, Timelines } from "@markwhen/parser";
 import { readFileSync, writeFileSync, watch } from "fs";
 import { fileURLToPath } from "url";
 import path from "path";
 import express from "express";
 import { parse as parseHtml } from "node-html-parser";
-import { Timelines } from "@markwhen/parser/lib/Types";
 import { WebSocketServer } from "ws";
 import ICAL from "ical.js";
 import { DateTime } from "luxon";

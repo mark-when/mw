@@ -7,9 +7,10 @@ import {
   toDateRange,
   type DateFormat,
   type DateRange,
-} from "@markwhen/parser/lib/Types.js";
-import type { SomeNode } from "@markwhen/parser/lib/Node.js";
-import { isEventNode, eventValue } from "@markwhen/parser/lib/Noder.js";
+  type SomeNode,
+  isEventNode,
+  eventValue,
+} from "@markwhen/parser";
 
 export enum Weight {
   SECOND = 0,
