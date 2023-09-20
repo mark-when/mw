@@ -1,3 +1,7 @@
+## 1.2.2
+
+- Bump deps
+
 ## 1.2.1
 - Very basic ical -> markwhen conversion
 

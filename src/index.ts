@@ -71,14 +71,9 @@ function templateHtml(viewType: Exclude<ViewType, "json">) {
 }
 
 const appState = (parsed: Timelines, rawText: string) => ({
-  app: {
-    isDark: false,
-  },
-  markwhen: {
-    rawText,
-    parsed: parsed.timelines,
-    transformed: parsed.timelines[0].events,
-  },
+  rawText,
+  parsed: parsed.timelines,
+  transformed: parsed.timelines[0].events,
 });
 
 function getInitialHtml(
