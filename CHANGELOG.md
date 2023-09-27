@@ -1,3 +1,7 @@
+## 1.2.3
+
+- Update timeline
+
 ## 1.2.2
 
 - Bump deps
