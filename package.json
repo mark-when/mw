@@ -1,6 +1,6 @@
 {
   "name": "@markwhen/mw",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "CLI for markwhen documents",
   "type": "module",
   "bin": {
