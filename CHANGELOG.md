@@ -1,3 +1,6 @@
+## 1.2.4
+- Bump parser and calendar
+
 ## 1.2.3
 
 - Update timeline
