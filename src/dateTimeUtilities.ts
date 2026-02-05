@@ -7,9 +7,9 @@ import {
   toDateRange,
   type DateFormat,
   type DateRange,
-  type SomeNode,
-  isEventNode,
-  eventValue,
+  type Eventy,
+  isEvent,
+  EventGroup,
 } from "@markwhen/parser";
 
 export enum Weight {
@@ -262,14 +262,15 @@ export function dateRangeToString(
   return `${asIso(range.fromDateTime)} - ${asIso(range.toDateTime)}`;
 }
 
-export const eventMidpoint = (node: SomeNode): DateTime | undefined => {
-  if (isEventNode(node)) {
-    return dateMidpoint(toDateRange(eventValue(node).dateRangeIso));
+export const eventMidpoint = (node: Eventy): DateTime | undefined => {
+  if (isEvent(node)) {
+    return dateMidpoint(toDateRange(node.dateRangeIso));
   } else {
-    if (!node.range || !node.range.fromDateTime || !node.range.toDateTime)
+    const group = node as EventGroup;
+    if (!group.range || !group.range.fromDateTime || !group.range.toDateTime)
       return undefined;
+    return dateMidpoint(group.range);
   }
-  return dateMidpoint(node.range);
 };
 
 export const dateMidpoint = (range: DateRange): DateTime => {

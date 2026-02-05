@@ -2,7 +2,7 @@
 
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { parse, Timelines } from "@markwhen/parser";
+import { parse, type ParseResult } from "@markwhen/parser";
 import { readFileSync, writeFileSync, watch } from "fs";
 import { fileURLToPath } from "url";
 import path from "path";
@@ -70,14 +70,14 @@ function templateHtml(viewType: Exclude<ViewType, "json">) {
   return templateHtml;
 }
 
-const appState = (parsed: Timelines, rawText: string) => ({
+const appState = (parsed: ParseResult, rawText: string) => ({
   rawText,
-  parsed: parsed.timelines,
-  transformed: parsed.timelines[0].events,
+  parsed: [parsed],
+  transformed: parsed.events,
 });
 
 function getInitialHtml(
-  parsed: Timelines,
+  parsed: ParseResult,
   rawText: string,
   viewType: ViewType
 ) {
@@ -215,7 +215,7 @@ async function main() {
     const app = express();
     app.get("/", (req, res) => {
       if (!outputType) {
-        const headerPreferredView = parsed.timelines[0].header?.preferredView;
+        const headerPreferredView = parsed.header?.preferredView;
         if (
           headerPreferredView &&
           ["timeline", "resume", "calendar"].includes(headerPreferredView)
@@ -242,7 +242,7 @@ var __markwhen_initial_state = ${JSON.stringify(appState(parsed, rawText))}`
     return;
   } else {
     if (!outputType) {
-      const headerPreferredView = parsed.timelines[0].header?.preferredView;
+      const headerPreferredView = parsed.header?.preferredView;
       if (
         headerPreferredView &&
         ["timeline", "resume", "calendar"].includes(headerPreferredView)
